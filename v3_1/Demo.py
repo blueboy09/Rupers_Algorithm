@@ -23,11 +23,11 @@ class DisplayWidget(QGLWidget):
     BG_COLOR = [0.0, 0.0, 0.0, 1.0]
     TRIANGLE_COLOR_VALUE = 0.3
     SEGMENT_COLOR = [0.0, 0.0, 1.0, 1.0]
-    EDGE_COLOR = [1.0, 1.0, 1.0, 1.0]
-    POINT_COLOR = [1.0, 0.0, 0.0, 1.0]
-    HIGHLIGHT_POINT_COLOR = POINT_COLOR
-    HIGHLIGHT_SEGMENT_COLOR = EDGE_COLOR
-    ENCROACHED_SEGMENT_COLOR = [0.0, 1.0, 1.0, 1.0]
+    EDGE_COLOR = [0.6, 0.6, 0.6, 0.6]
+    POINT_COLOR = [1.0, 0.0, 1.0, 1.0]
+    HIGHLIGHT_POINT_COLOR = [1.0, 0.0, 0.0, 1.0]
+    HIGHLIGHT_SEGMENT_COLOR = [1.0, 1.0, 1.0, 1.0]
+    ENCROACHED_SEGMENT_COLOR = [1.0, 0.0, 0.0, 1.0]
 
     FILL_SCREEN_RATIO = 0.8
 
@@ -35,11 +35,10 @@ class DisplayWidget(QGLWidget):
     SEGMENT_LINE_WIDTH = 7.0
     EDGE_LINE_WIDTH = 1.0
     MAX_POINT_SIZE = 30.0
-    MAX_LINE_WIDTH = 30.0
+    MAX_LINE_WIDTH = 10.0
 
     def __init__(self, parent):
         QGLWidget.__init__(self, parent)
-        self.setMinimumSize(500, 500)
 
         self.offset_x = 0.0
         self.offset_y = 0.0
@@ -194,31 +193,29 @@ void main()
 
                         # Highlight segment
                         lw = DisplayWidget.MAX_LINE_WIDTH / DisplayWidget.ANIMATION_ROUNDS_QUARTER * (DisplayWidget.ANIMATION_ROUNDS_QUARTER - abs(DisplayWidget.ANIMATION_ROUNDS_QUARTER - (self.round % DisplayWidget.ANIMATION_ROUNDS_HALF)))
-                        if lw == 0.0:
-                            lw = 1.0
-                        glLineWidth(lw)
-                        glUniform4fv(self.uniform_color, 1, DisplayWidget.HIGHLIGHT_SEGMENT_COLOR)
-                        data5 = np.zeros((1, 2), dtype='uint32')
-                        data5[0][0] = self.step2Segment[0]
-                        data5[0][1] = self.step2Segment[1]
-                        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.vbo3)
-                        glBufferData(GL_ELEMENT_ARRAY_BUFFER, 8 * len(data5), data5, GL_STATIC_DRAW)
-                        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.vbo3)
-                        glDrawElements(GL_LINES, 2 * len(data5), GL_UNSIGNED_INT, None)
+                        if lw > 0.0:
+                            glLineWidth(lw)
+                            glUniform4fv(self.uniform_color, 1, DisplayWidget.HIGHLIGHT_SEGMENT_COLOR)
+                            data5 = np.zeros((1, 2), dtype='uint32')
+                            data5[0][0] = self.step2Segment[0]
+                            data5[0][1] = self.step2Segment[1]
+                            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.vbo3)
+                            glBufferData(GL_ELEMENT_ARRAY_BUFFER, 8 * len(data5), data5, GL_STATIC_DRAW)
+                            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.vbo3)
+                            glDrawElements(GL_LINES, 2 * len(data5), GL_UNSIGNED_INT, None)
 
                         # Highlight point
                         ps = DisplayWidget.MAX_POINT_SIZE / DisplayWidget.ANIMATION_ROUNDS_QUARTER * (DisplayWidget.ANIMATION_ROUNDS_QUARTER - abs(DisplayWidget.ANIMATION_ROUNDS_QUARTER - (self.round % DisplayWidget.ANIMATION_ROUNDS_HALF)))
-                        if ps == 0.0:
-                            ps = 1.0
-                        glPointSize(ps)
-                        glUniform4fv(self.uniform_color, 1, DisplayWidget.HIGHLIGHT_POINT_COLOR)
-                        data6 = np.zeros((1, 2), dtype='float32')
-                        data6[0][0] = self.step2Vertex[0]
-                        data6[0][1] = self.step2Vertex[1]
-                        glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
-                        glBufferData(GL_ARRAY_BUFFER, 8 * len(data6), data6, GL_STATIC_DRAW)
-                        glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
-                        glDrawArrays(GL_POINTS, 0, len(data6))
+                        if ps > 0.0:
+                            glPointSize(ps)
+                            glUniform4fv(self.uniform_color, 1, DisplayWidget.HIGHLIGHT_POINT_COLOR)
+                            data6 = np.zeros((1, 2), dtype='float32')
+                            data6[0][0] = self.step2Vertex[0]
+                            data6[0][1] = self.step2Vertex[1]
+                            glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
+                            glBufferData(GL_ARRAY_BUFFER, 8 * len(data6), data6, GL_STATIC_DRAW)
+                            glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
+                            glDrawArrays(GL_POINTS, 0, len(data6))
 
                         if self.round == DisplayWidget.ANIMATION_ROUNDS - 1:
                             # Add point, 2 segments, 3 triangles
@@ -246,17 +243,16 @@ void main()
 
                         # Highlight new point
                         ps = DisplayWidget.MAX_POINT_SIZE / DisplayWidget.ANIMATION_ROUNDS_QUARTER * (DisplayWidget.ANIMATION_ROUNDS_QUARTER - abs(DisplayWidget.ANIMATION_ROUNDS_QUARTER - (self.round % DisplayWidget.ANIMATION_ROUNDS_HALF)))
-                        if ps == 0.0:
-                            ps = 1.0
-                        glPointSize(ps)
-                        glUniform4fv(self.uniform_color, 1, DisplayWidget.HIGHLIGHT_POINT_COLOR)
-                        data6 = np.zeros((1, 2), dtype='float32')
-                        data6[0][0] = self.step4Vertex[0]
-                        data6[0][1] = self.step4Vertex[1]
-                        glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
-                        glBufferData(GL_ARRAY_BUFFER, 8 * len(data6), data6, GL_STATIC_DRAW)
-                        glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
-                        glDrawArrays(GL_POINTS, 0, len(data6))
+                        if ps > 0.0:
+                            glPointSize(ps)
+                            glUniform4fv(self.uniform_color, 1, DisplayWidget.HIGHLIGHT_POINT_COLOR)
+                            data6 = np.zeros((1, 2), dtype='float32')
+                            data6[0][0] = self.step4Vertex[0]
+                            data6[0][1] = self.step4Vertex[1]
+                            glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
+                            glBufferData(GL_ARRAY_BUFFER, 8 * len(data6), data6, GL_STATIC_DRAW)
+                            glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
+                            glDrawArrays(GL_POINTS, 0, len(data6))
 
                         if self.round == DisplayWidget.ANIMATION_ROUNDS - 1:
                             # Add point, 3 triangles
@@ -266,42 +262,55 @@ void main()
                             self.triangles[Ruper.GetTriangleKey(self.step4AddedTriangles[1])] = True
                             self.triangles[Ruper.GetTriangleKey(self.step4AddedTriangles[2])] = True
                             del self.triangles[Ruper.GetTriangleKey(self.step4DeletedTriangle)]
-                elif self.round < DisplayWidget.ANIMATION_ROUNDS * (1 + len(self.FlipSequence)):
-                    if self.round == 40:
+                elif self.round < DisplayWidget.ANIMATION_ROUNDS * (1 + len(self.LocationSequence)):
+                    if self.round == DisplayWidget.ANIMATION_ROUNDS:
+                        self.parent().displayText.setText(self.parent().displayText.text() + u"三角形外心点定位\n")
+
+                    # Highlight triangle path
+                    triangle_id = self.round / DisplayWidget.ANIMATION_ROUNDS - 1
+                    triangle = self.LocationSequence[triangle_id]
+                    
+                    gray = DisplayWidget.TRIANGLE_COLOR_VALUE + (1.0 - DisplayWidget.TRIANGLE_COLOR_VALUE) / DisplayWidget.ANIMATION_ROUNDS_QUARTER * (DisplayWidget.ANIMATION_ROUNDS_QUARTER - abs(DisplayWidget.ANIMATION_ROUNDS_QUARTER - (self.round % DisplayWidget.ANIMATION_ROUNDS_HALF)))
+                    glUniform4f(self.uniform_color, gray, gray, gray, 1.0)
+                    data5 = np.array(triangle, dtype='uint32')
+                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.vbo3)
+                    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 4 * len(data5), data5, GL_STATIC_DRAW)
+                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.vbo3)
+                    glDrawElements(GL_TRIANGLES, len(data5), GL_UNSIGNED_INT, None)
+                elif self.round < DisplayWidget.ANIMATION_ROUNDS * (1 + len(self.LocationSequence) + len(self.FlipSequence)):
+                    if self.round == DisplayWidget.ANIMATION_ROUNDS * (1 + len(self.LocationSequence)):
                         self.parent().displayText.setText(self.parent().displayText.text() + u"调整三角化所用边\n")
 
                     # Highlight flip sequence
-                    flip_seq_id = self.round / DisplayWidget.ANIMATION_ROUNDS - 1
+                    flip_seq_id = self.round / DisplayWidget.ANIMATION_ROUNDS - len(self.LocationSequence) - 1
 
                     # Edge flipped?
                     lw = DisplayWidget.MAX_LINE_WIDTH / DisplayWidget.ANIMATION_ROUNDS_QUARTER * (DisplayWidget.ANIMATION_ROUNDS_QUARTER - abs(DisplayWidget.ANIMATION_ROUNDS_QUARTER - (self.round % DisplayWidget.ANIMATION_ROUNDS_HALF)))
-                    if lw == 0.0:
-                        lw = 1.0
-                    glLineWidth(lw)
-                    glUniform4fv(self.uniform_color, 1, DisplayWidget.HIGHLIGHT_SEGMENT_COLOR)
-                    data5 = np.zeros((1, 2), dtype='uint32')
-                    if self.FlipSequence[flip_seq_id][1] == 0 or self.round % DisplayWidget.ANIMATION_ROUNDS < DisplayWidget.ANIMATION_ROUNDS_HALF:
-                        data5[0][0] = self.FlipSequence[flip_seq_id][0][1]
-                        data5[0][1] = self.FlipSequence[flip_seq_id][0][2]
-                    else:
-                        data5[0][0] = self.FlipSequence[flip_seq_id][0][0]
-                        data5[0][1] = self.FlipSequence[flip_seq_id][0][3]
-                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.vbo3)
-                    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 8 * len(data5), data5, GL_STATIC_DRAW)
-                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.vbo3)
-                    glDrawElements(GL_LINES, 2 * len(data5), GL_UNSIGNED_INT, None)
+                    if lw > 0.0:
+                        glLineWidth(lw)
+                        glUniform4fv(self.uniform_color, 1, DisplayWidget.HIGHLIGHT_SEGMENT_COLOR)
+                        data5 = np.zeros((1, 2), dtype='uint32')
+                        if self.FlipSequence[flip_seq_id][1] == 0 or self.round % DisplayWidget.ANIMATION_ROUNDS < DisplayWidget.ANIMATION_ROUNDS_HALF:
+                            data5[0][0] = self.FlipSequence[flip_seq_id][0][1]
+                            data5[0][1] = self.FlipSequence[flip_seq_id][0][2]
+                        else:
+                            data5[0][0] = self.FlipSequence[flip_seq_id][0][0]
+                            data5[0][1] = self.FlipSequence[flip_seq_id][0][3]
+                        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.vbo3)
+                        glBufferData(GL_ELEMENT_ARRAY_BUFFER, 8 * len(data5), data5, GL_STATIC_DRAW)
+                        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.vbo3)
+                        glDrawElements(GL_LINES, 2 * len(data5), GL_UNSIGNED_INT, None)
 
                     # 4 points
                     ps = DisplayWidget.MAX_POINT_SIZE / DisplayWidget.ANIMATION_ROUNDS_QUARTER * (DisplayWidget.ANIMATION_ROUNDS_QUARTER - abs(DisplayWidget.ANIMATION_ROUNDS_QUARTER - (self.round % DisplayWidget.ANIMATION_ROUNDS_HALF)))
-                    if ps == 0.0:
-                        ps = 1.0
-                    glPointSize(ps)
-                    glUniform4fv(self.uniform_color, 1, DisplayWidget.HIGHLIGHT_POINT_COLOR)
-                    data6 = np.array(self.FlipSequence[flip_seq_id][0], dtype='uint32')
-                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.vbo3)
-                    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 8 * len(data6), data6, GL_STATIC_DRAW)
-                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.vbo3)
-                    glDrawElements(GL_POINTS, len(data6), GL_UNSIGNED_INT, None)
+                    if ps > 0.0:
+                        glPointSize(ps)
+                        glUniform4fv(self.uniform_color, 1, DisplayWidget.HIGHLIGHT_POINT_COLOR)
+                        data6 = np.array(self.FlipSequence[flip_seq_id][0], dtype='uint32')
+                        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.vbo3)
+                        glBufferData(GL_ELEMENT_ARRAY_BUFFER, 8 * len(data6), data6, GL_STATIC_DRAW)
+                        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.vbo3)
+                        glDrawElements(GL_POINTS, len(data6), GL_UNSIGNED_INT, None)
 
                     if self.round % DisplayWidget.ANIMATION_ROUNDS == DisplayWidget.ANIMATION_ROUNDS_HALF:
                         if self.FlipSequence[flip_seq_id][1] != 0:
@@ -318,15 +327,14 @@ void main()
 
                     # Highlight encroached segments
                     lw = DisplayWidget.MAX_LINE_WIDTH / DisplayWidget.ANIMATION_ROUNDS_QUARTER * (DisplayWidget.ANIMATION_ROUNDS_QUARTER - abs(DisplayWidget.ANIMATION_ROUNDS_QUARTER - (self.round % DisplayWidget.ANIMATION_ROUNDS_HALF)))
-                    if lw == 0.0:
-                        lw = 1.0
-                    glLineWidth(lw)
-                    glUniform4fv(self.uniform_color, 1, DisplayWidget.ENCROACHED_SEGMENT_COLOR)
-                    data2 = np.array(self.EncroachedSegments, dtype='uint32')
-                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.vbo2)
-                    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 8 * len(data2), data2, GL_STATIC_DRAW)
-                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.vbo2)
-                    glDrawElements(GL_LINES, 2 * len(data2), GL_UNSIGNED_INT, None)
+                    if lw > 0.0:
+                        glLineWidth(lw)
+                        glUniform4fv(self.uniform_color, 1, DisplayWidget.ENCROACHED_SEGMENT_COLOR)
+                        data2 = np.array(self.EncroachedSegments, dtype='uint32')
+                        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.vbo2)
+                        glBufferData(GL_ELEMENT_ARRAY_BUFFER, 8 * len(data2), data2, GL_STATIC_DRAW)
+                        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.vbo2)
+                        glDrawElements(GL_LINES, 2 * len(data2), GL_UNSIGNED_INT, None)
 
     def updateStep2Single(self, step2Vertex, step2Segment, step2AddedSegments, step2DeletedTriangle, step2AddedTriangles, EncroachedSegments, FlipSequence, vertices, segments, triangles):
         self.stepType = 2
@@ -337,22 +345,26 @@ void main()
         self.step2AddedTriangles = step2AddedTriangles
         self.EncroachedSegments = EncroachedSegments
         self.FlipSequence = FlipSequence
+        self.LocationSequence = []
         thread = threading.Thread(target=self.updateStep2SingleThread, args=(vertices, segments, triangles, self.parent()))
         thread.start()
     def updateStep2SingleThread(self, vertices, segments, triangles, widget):
+        self.stop_animation = False
         rounds = 1 + len(self.FlipSequence)
         if len(self.EncroachedSegments) > 0:
             rounds = rounds + 1
         for self.round in range(0, DisplayWidget.ANIMATION_ROUNDS * rounds):
             self.update()
             time.sleep(DisplayWidget.ANIMATION_TIME)
+            if self.stop_animation:
+                break
         self.round = -1
         self.setData(vertices, segments, triangles)
         self.update()
 
         widget.animationEnd()
 
-    def updateStep4Single(self, step4Vertex, step4Triangle, step4DeletedTriangle, step4AddedTriangles, EncroachedSegments, FlipSequence, vertices, segments, triangles):
+    def updateStep4Single(self, step4Vertex, step4Triangle, step4DeletedTriangle, step4AddedTriangles, EncroachedSegments, FlipSequence, LocationSequence, vertices, segments, triangles):
         self.stepType = 4
         self.step4Vertex = step4Vertex
         self.step4Triangle = step4Triangle
@@ -360,15 +372,19 @@ void main()
         self.step4AddedTriangles = step4AddedTriangles
         self.EncroachedSegments = EncroachedSegments
         self.FlipSequence = FlipSequence
+        self.LocationSequence = LocationSequence
         thread = threading.Thread(target=self.updateStep4SingleThread, args=(vertices, segments, triangles, self.parent()))
         thread.start()
     def updateStep4SingleThread(self, vertices, segments, triangles, widget):
+        self.stop_animation = False
         rounds = 1 + len(self.FlipSequence)
         if len(self.EncroachedSegments) > 0:
             rounds = rounds + 1
         for self.round in range(0, DisplayWidget.ANIMATION_ROUNDS * rounds):
             self.update()
             time.sleep(DisplayWidget.ANIMATION_TIME)
+            if self.stop_animation:
+                break
         self.round = -1
         self.setData(vertices, segments, triangles)
         self.update()
@@ -457,6 +473,9 @@ void main()
         self.tmp_offset_y = 0.0
         self.scale = 2.0 * DisplayWidget.FILL_SCREEN_RATIO / max(x_max - x_min, y_max - y_min)
 
+    def skipAnimation(self):
+        self.stop_animation = True
+
 class Form(QWidget):
     STATE_INIT = 0
     STATE_LOADED = 1
@@ -474,6 +493,8 @@ class Form(QWidget):
         self.buttonReset.clicked.connect(self.reset)
         self.buttonLoad = QPushButton("Load from file")
         self.buttonLoad.clicked.connect(self.load)
+        self.buttonStopAnimation = QPushButton("Stop Animation")
+        self.buttonStopAnimation.clicked.connect(self.skipAnimation)
         self.buttonStep1 = QPushButton("Step1")
         self.buttonStep1.clicked.connect(self.step1)
         self.buttonStep2Single = QPushButton("Step2 Single")
@@ -488,9 +509,10 @@ class Form(QWidget):
         self.buttonStep4Single.clicked.connect(self.step4Single)
 
         buttonLayout = QHBoxLayout()
-        buttonLayout.addWidget(self.buttonGenerate)
         buttonLayout.addWidget(self.buttonReset)
+        buttonLayout.addWidget(self.buttonGenerate)
         buttonLayout.addWidget(self.buttonLoad)
+        buttonLayout.addWidget(self.buttonStopAnimation)
         buttonLayout.addWidget(self.buttonStep1)
         buttonLayout.addWidget(self.buttonStep2Single)
         buttonLayout.addWidget(self.buttonStep2)
@@ -499,23 +521,29 @@ class Form(QWidget):
         buttonLayout.addWidget(self.buttonStep4)
 
         self.displayWidget = DisplayWidget(self)
+        self.displayWidget.setMinimumSize(600, 600)
+        self.displayWidget.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
         self.displayText = QLabel()
         f = self.displayText.font()
-        f.setPixelSize(48)
+        f.setPixelSize(30)
         self.displayText.setFont(f)
-        self.displayLayout = QHBoxLayout()
-        self.displayLayout.addWidget(self.displayWidget)
-        self.displayLayout.addWidget(self.displayText)
+        self.displayText.setFixedWidth(400)
+        displayLayout = QHBoxLayout()
+        displayLayout.addWidget(self.displayWidget)
+        displayLayout.addWidget(self.displayText)
 
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(buttonLayout)
-        mainLayout.addLayout(self.displayLayout)
+        mainLayout.addLayout(displayLayout)
 
         self.setLayout(mainLayout)
         self.setWindowTitle("Demo")
 
         self.in_animation = False
         self.setState(Form.STATE_INIT)
+
+    def skipAnimation(self):
+        self.displayWidget.skipAnimation()
 
     def animationEnd(self):
         self.in_animation = False
@@ -597,11 +625,13 @@ class Form(QWidget):
         if result != None:
             self.displayWidget.updateStep2Single(result.vertex, result.segment, result.addedSegments, result.deletedTriangle, result.addedTriangles, result.encroachedS, result.flipSequence, self.ruper.vertices, self.ruper.segments, self.ruper.triangles)
         
-        self.in_animation = True
-        if self.ruper.stage == 2:   
-            self.setState(Form.STATE_STEP2_DONE)
+            self.in_animation = True
+            if self.ruper.stage == 2:   
+                self.setState(Form.STATE_STEP2_DONE)
+            else:
+                self.setState(Form.STATE_STEP1_DONE)
         else:
-            self.setState(Form.STATE_STEP1_DONE)
+            self.setState(Form.STATE_STEP2_DONE)
 
     def step2(self):
         while self.ruper.stage != 2:
@@ -610,7 +640,7 @@ class Form(QWidget):
         self.displayWidget.setData(self.ruper.vertices, self.ruper.segments, self.ruper.triangles)
         self.displayWidget.update()
 
-        self.displayText.setText(u"加中点，解决过细三角形")
+        self.displayText.setText(u"加中点\n解决过细三角形")
             
         self.setState(Form.STATE_STEP2_DONE)
 
@@ -632,15 +662,17 @@ class Form(QWidget):
             if result.operation == 'split':
                 self.displayWidget.updateStep2Single(result.vertex, result.segment, result.addedSegments, result.deletedTriangle, result.addedTriangles, result.encroachedS, result.flipSequence, self.ruper.vertices, self.ruper.segments, self.ruper.triangles)
             elif result.operation == 'insert':
-                self.displayWidget.updateStep4Single(result.vertex, result.triangle, result.deletedTriangle, result.addedTriangles, result.encroachedS, result.flipSequence, self.ruper.vertices, self.ruper.segments, self.ruper.triangles)
+                self.displayWidget.updateStep4Single(result.vertex, result.triangle, result.deletedTriangle, result.addedTriangles, result.encroachedS, result.flipSequence, result.locationSequence, self.ruper.vertices, self.ruper.segments, self.ruper.triangles)
             else:
                 self.displayWidget.update()
 
-        self.in_animation = True
-        if self.ruper.stage == 4:    
-            self.setState(Form.STATE_STEP4_DONE)
+            self.in_animation = True
+            if self.ruper.stage == 4:    
+                self.setState(Form.STATE_INIT)
+            else:
+                self.setState(Form.STATE_STEP3_DONE)
         else:
-            self.setState(Form.STATE_STEP3_DONE)
+            self.setState(Form.STATE_INIT)
 
     def step4(self):
         while self.ruper.stage != 4:
@@ -649,9 +681,9 @@ class Form(QWidget):
         self.displayWidget.setData(self.ruper.vertices, self.ruper.segments, self.ruper.triangles)
         self.displayWidget.update()
 
-        self.displayText.setText(u"加中点／加外心，解决过细三角形")
+        self.displayText.setText(u"加中点／加外心\n解决过细三角形")
             
-        self.setState(Form.STATE_STEP4_DONE)
+        self.setState(Form.STATE_INIT)
 
 if __name__ == '__main__':
     import sys
